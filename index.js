@@ -57,6 +57,6 @@ const myBot = new MyBot(conversationState);
 server.post('/api/messages', (req, res) => {
     adapter.processActivity(req, res, async (context) => {
         // Route to main dialog.
-        await myBot.run(context);
+        await myBot.onTurn(context);
     });
 });
