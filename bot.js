@@ -16,7 +16,7 @@ class MyBot {
         this.conversationState = conversationState;
     }
 
-    async onTurn(turnContext) {
+	async onTurn(turnContext) {
     	if(turnContext.activity.type === ActivityHandler.Message) {
 			let count = await this.countProperty.get(turnContext);
             count = count === undefined ? 1 : ++count;
