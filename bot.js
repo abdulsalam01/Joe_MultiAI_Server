@@ -6,7 +6,7 @@ const { ActivityHandler } = require('botbuilder');
 // Turn counter property
 const TURN_COUNTER_PROPERTY = 'turnCounterProperty';
 
-class MyBot extends ActivityHandler {
+class MyBot {
     constructor(conversationState) {
         // super();
         // See https://aka.ms/about-bot-activity-message to learn more about the message and other activity types.
@@ -14,7 +14,7 @@ class MyBot extends ActivityHandler {
         // this.onConversationUpdate(async turnContext => { console.log('this gets called (conversatgion update'); await turnContext.sendActivity('[conversationUpdate event detected]'); });
 
 		this.countProperty = conversationState.createProperty(TURN_COUNTER_PROPERTY);
-        this.conversationState = this.countProperty;
+        this.conversationState = conversationState;
     }
 
     async onTurn(turnContext) {
