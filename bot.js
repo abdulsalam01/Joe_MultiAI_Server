@@ -5,7 +5,7 @@ const { ActivityHandler } = require('botbuilder');
 
 // Turn counter property
 const TURN_COUNTER_PROPERTY = 'turnCounterProperty';
-
+let count = 0;
 class MyBot extends ActivityHandler {
     constructor() {
         super();
