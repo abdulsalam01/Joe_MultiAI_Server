@@ -19,7 +19,7 @@ dotenv.config({ path: ENV_FILE });
 // Create HTTP server
 const server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, () => {
-    console.log(`\n${ server.name } listening to ${ server.url }`);
+    console.log(`\n${server.name} listening to ${server.url}`);
     console.log(`\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator`);
     console.log(`\nTo talk to your bot, open the emulator select "Open Bot"`);
     console.log(`\nSee https://aka.ms/connect-to-bot for more information`);
@@ -37,31 +37,31 @@ const adapter = new BotFrameworkAdapter({
 // Catch-all for errors.
 adapter.onTurnError = async (context, error) => {
     // This check writes out errors to console log .vs. app insights.
-    console.error(`\n [onTurnError]: ${ error }`);
+    console.error(`\n [onTurnError]: ${error}`);
     // Send a message to the user
     await context.sendActivity(`Oops. Something went wrong!`);
-    
+
     // Clear out state
-    await conversationState.clear(context);
+    // await conversationState.clear(context);
     // Save state changes.
-    await conversationState.saveChanges(context);
+    // await conversationState.saveChanges(context);
 };
 
-let conversationState;
+// let conversationState;
 
 // For local development, in-memory storage is used.
 // CAUTION: The Memory Storage used here is for local bot debugging only. When the bot
 // is restarted, anything stored in memory will be gone.
-const memoryStorage = new MemoryStorage();
-conversationState = new ConversationState(memoryStorage);
+// const memoryStorage = new MemoryStorage();
+// conversationState = new ConversationState(memoryStorage);
 
 // Create the main dialog.
-const myBot = new MyBot(conversationState);
+const myBot = new MyBot();
 
 // Listen for incoming requests.
 server.post('/api/messages', (req, res) => {
     adapter.processActivity(req, res, async (context) => {
         // Route to main dialog.
-        await myBot.onTurn(context);
+        await myBot.run(context);
     });
 });
