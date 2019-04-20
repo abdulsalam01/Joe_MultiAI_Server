@@ -40,15 +40,28 @@ adapter.onTurnError = async (context, error) => {
     console.error(`\n [onTurnError]: ${ error }`);
     // Send a message to the user
     await context.sendActivity(`Oops. Something went wrong!`);
+    
+    // Clear out state
+    await conversationState.clear(context);
+    // Save state changes.
+    await conversationState.saveChanges(context);
 };
 
+let conversationState;
+
+// For local development, in-memory storage is used.
+// CAUTION: The Memory Storage used here is for local bot debugging only. When the bot
+// is restarted, anything stored in memory will be gone.
+const memoryStorage = new MemoryStorage();
+conversationState = new ConversationState(memoryStorage);
+
 // Create the main dialog.
-const myBot = new MyBot();
+const myBot = new MyBot(conversationState);
 
 // Listen for incoming requests.
 server.post('/api/messages', (req, res) => {
     adapter.processActivity(req, res, async (context) => {
         // Route to main dialog.
-        await myBot.run(context);
+        await myBot.onTurn(context);
     });
 });
