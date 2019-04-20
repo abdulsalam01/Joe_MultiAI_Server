@@ -14,7 +14,7 @@ class MyBot extends ActivityHandler {
         // this.onConversationUpdate(async turnContext => { console.log('this gets called (conversatgion update'); await turnContext.sendActivity('[conversationUpdate event detected]'); });
 
 		this.countProperty = conversationState.createProperty(TURN_COUNTER_PROPERTY);
-        this.conversationState = conversationState;
+        this.conversationState = this.countProperty;
     }
 
     async onTurn(turnContext) {
