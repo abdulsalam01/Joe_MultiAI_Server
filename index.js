@@ -1,6 +1,3 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
-
 const dotenv = require('dotenv');
 const path = require('path');
 const restify = require('restify');
@@ -59,9 +56,79 @@ adapter.onTurnError = async (context, error) => {
 const myBot = new MyBot();
 
 // Listen for incoming requests.
-server.post('/api/messages', (req, res) => {
-    adapter.processActivity(req, res, async (context) => {
-        // Route to main dialog.
-        await myBot.run(context);
-    });
+// server.post('/api/messages', (req, res) => {
+//     adapter.processActivity(req, res, async (context) => {
+//         // Route to main dialog.
+//         await myBot.run(context);
+//     });
+// });
+
+server.post('/api/messages', connector.listen());
+
+var bot = new builder.UniversalBot(connector, (session) => {
+    session.sendTyping();
+    setTimeout(function () {
+        session.send("Hello there...");
+    }, 3000);
+    session.endDialog(`I'm sorry, I did not understand '${session.message.text}'.\nType 'help' to know more about me :)`);
 });
+
+var luisRecognizer = new builder.LuisRecognizer(process.env.LUIS_MODEL_URL).onEnabled(function (context, callback) {
+    var enabled = context.dialogStack().length === 0;
+    callback(null, enabled);
+});
+bot.recognizer(luisRecognizer);
+
+bot.dialog('Greetings', [
+    (session, args, next) => {
+        var greetings = builder.EntityRecognizer.findEntity(args.intent.entities, 'greetings');
+
+
+        if (greetings && greetings.resolution.values.length > 0) {
+            session.dialogData.greetings = greetings.resolution.values[0];
+        }
+
+        session.dialogData.firstmessage = session.message.text;
+
+        if (!session.dialogData.greetings) {
+
+            builder.Prompts.text(session, `it seems you are having a tough day, but i hope I can make it better by recommending the best pizza place to you`);
+        } else {
+            next();
+        }
+    },
+
+    (session, result, next) => {
+        builder.Prompts.text(session, `But first can you tell me your name please?`);
+    },
+
+
+    (session, result, next) => {
+        session.dialogData.name = result.response;
+        session.send(`Glad to meet you ${session.dialogData.name}`);
+        builder.Prompts.text(session, `Tell me about yourself ${session.dialogData.name}. What do you do? What do you do for fun?`);
+    },
+
+    (session, result, next) => {
+        session.dialogData.about = result.response;
+        about = session.dialogData.about;
+    }
+])
+    .triggerAction({ matches: 'Greetings' });
+
+bot.dialog('Weather.GetForecast',[
+    (session, args, next) =>{
+        //Find which city the weather forecast is being asked
+        var city = new builder.EntityRecognizer.findEntity(args.entities, 'Weather.Location').entity;
+        var api = 'http://api.openweathermap.org/data/2.5/weather?q=' + city + '&amp;APPID=a590007f62779ccdd4d2e3bfb47856ea&amp;callback=?'
+        var request = require('request');
+
+        request(api, function (error, response, body) {
+            if (response.statusCode == 200) {
+            session.send("Weather in: " + city);
+            session.send(JSON.stringify(body, null, 4));
+            }
+        }
+    }
+])
+.triggerAction({matches: 'Weather.GetForecast'});
