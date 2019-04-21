@@ -27,6 +27,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 const adapter = new BotFrameworkAdapter({
     appId: process.env.MicrosoftAppId,
     appPassword: process.env.MicrosoftAppPassword,
+    appSecretKey: process.env.MicrosoftAppSecretKey,
     channelService: process.env.ChannelService,
     openIdMetadata: process.env.BotOpenIdMetadata
 });
