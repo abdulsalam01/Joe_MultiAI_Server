@@ -83,19 +83,19 @@ bot.dialog('Greetings', [
     (session, args, next) => {
         var greetings = builder.EntityRecognizer.findEntity(args.intent.entities, 'greetings');
 
+        builder.Prompts.text(session, `it seems you are having a tough day, but i hope I can make it better by recommending the best pizza place to you`);
+        // if (greetings && greetings.resolution.values.length > 0) {
+        //     session.dialogData.greetings = greetings.resolution.values[0];
+        // }
 
-        if (greetings && greetings.resolution.values.length > 0) {
-            session.dialogData.greetings = greetings.resolution.values[0];
-        }
+        // session.dialogData.firstmessage = session.message.text;
 
-        session.dialogData.firstmessage = session.message.text;
+        // if (!session.dialogData.greetings) {
 
-        if (!session.dialogData.greetings) {
-
-            builder.Prompts.text(session, `it seems you are having a tough day, but i hope I can make it better by recommending the best pizza place to you`);
-        } else {
-            next();
-        }
+        //     builder.Prompts.text(session, `it seems you are having a tough day, but i hope I can make it better by recommending the best pizza place to you`);
+        // } else {
+        //     next();
+        // }
     },
 
     (session, result, next) => {
@@ -116,8 +116,8 @@ bot.dialog('Greetings', [
 ])
     .triggerAction({ matches: 'Greetings' });
 
-bot.dialog('Weather.GetForecast',[
-    (session, args, next) =>{
+bot.dialog('Weather.GetForecast', [
+    (session, args, next) => {
         //Find which city the weather forecast is being asked
         var city = new builder.EntityRecognizer.findEntity(args.entities, 'Weather.Location').entity;
         var api = 'http://api.openweathermap.org/data/2.5/weather?q=' + city + '&amp;APPID=a590007f62779ccdd4d2e3bfb47856ea&amp;callback=?'
@@ -125,10 +125,10 @@ bot.dialog('Weather.GetForecast',[
 
         request(api, function (error, response, body) {
             if (response.statusCode == 200) {
-            session.send("Weather in: " + city);
-            session.send(JSON.stringify(body, null, 4));
+                session.send("Weather in: " + city);
+                session.send(JSON.stringify(body, null, 4));
             }
         }
     }
 ])
-.triggerAction({matches: 'Weather.GetForecast'});
+    .triggerAction({ matches: 'Weather.GetForecast' });
